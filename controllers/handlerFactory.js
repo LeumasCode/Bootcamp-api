@@ -69,7 +69,9 @@ exports.getAll = (Model) =>
       .sort()
       .limitFields()
       .paginate();
-    
+
+   
+
     // await the query
     const doc = await features.query;
     // query.sort().select().skip().limit()

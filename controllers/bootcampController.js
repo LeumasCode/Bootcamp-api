@@ -2,8 +2,7 @@ const Bootcamp = require('../models/bootcampModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const geocoder = require('../utils/geocoder');
-const factory = require('./handlerFactory')
-
+const factory = require('./handlerFactory');
 
 // @desc GET ALL BOOTCAMPS
 
@@ -11,7 +10,7 @@ const factory = require('./handlerFactory')
 
 // @access Public
 
-exports.getAllBootcamp = factory.getAll(Bootcamp)
+exports.getAllBootcamp = factory.getAll(Bootcamp);
 
 // @desc GET A SINGLE BOOTCAMP
 
@@ -19,7 +18,7 @@ exports.getAllBootcamp = factory.getAll(Bootcamp)
 
 // @access Public
 
-exports.getBootcamp = factory.getOne(Bootcamp)
+exports.getBootcamp = factory.getOne(Bootcamp, {path: 'courses', select: 'name description'});
 
 // @desc CREATE NEW BOOTCAMP
 
@@ -71,7 +70,13 @@ exports.updateBootcamp = catchAsync(async (req, res, next) => {
 
 exports.deleteBootcamp = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  await Bootcamp.findByIdAndDelete(id);
+  const bootcamp = await Bootcamp.findById(id);
+
+  if (!bootcamp) {
+    next(new AppError(`Bootcamp not found with id ${id}`, 404));
+  }
+
+  bootcamp.remove();
 
   res.status(204).json({
     status: 'success',
