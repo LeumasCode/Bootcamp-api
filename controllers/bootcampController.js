@@ -2,23 +2,14 @@ const Bootcamp = require('../models/bootcampModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const geocoder = require('../utils/geocoder');
+const factory = require('./handlerFactory')
 // @desc GET ALL BOOTCAMPS
 
 // @route GET /api/v1/bootcamps
 
 // @access Public
 
-exports.getAllBootcamp = catchAsync(async (req, res, next) => {
-  const bootcamps = await Bootcamp.find();
-
-  res.status(200).json({
-    status: 'success',
-    result: bootcamps.length,
-    data: {
-      bootcamps,
-    },
-  });
-});
+exports.getAllBootcamp = factory.getAll(Bootcamp)
 
 // @desc GET A SINGLE BOOTCAMP
 

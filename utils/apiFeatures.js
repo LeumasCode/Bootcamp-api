@@ -5,13 +5,21 @@ class APIFeatures {
   }
 
   filter() {
+    // copy req.query
     const queryObj = { ...this.queryString };
+
+    // Exclude fields from the req.query and remove them from queryObj
     const excluded = ['page', 'sort', 'limit', 'fields'];
     excluded.forEach((el) => delete queryObj[el]);
 
     // (2) Advance filtering(filtering)
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    //create operators like ($gt, $gte)
+    queryStr = queryStr.replace(
+      /\b(gte|gt|lte|lt|in)\b/g,
+      (match) => `$${match}`
+    );
 
     this.query = this.query.find(JSON.parse(queryStr));
     return this;

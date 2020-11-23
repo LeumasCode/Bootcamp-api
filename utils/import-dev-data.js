@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Bootcamp = require('../models/bootcampModel');
 // const User = require('../../models/userModel');
-// const Review = require('../../models/reviewModel');
+const Course = require('../models/courseModel');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -20,9 +20,11 @@ mongoose
 const bootcamps = JSON.parse(
   fs.readFileSync(`${__dirname}/../_data/bootcamps.json`, 'utf-8')
 );
-console.log(bootcamps);
+//console.log(bootcamps);
 
-// const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+const courses = JSON.parse(
+  fs.readFileSync(`${__dirname}/../_data/courses.json`, 'utf-8')
+);
 
 // const reviews = JSON.parse(
 //   fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
@@ -31,9 +33,9 @@ console.log(bootcamps);
 // IMPORT THE DATA INTO DATABASE
 const importData = async () => {
   try {
-    await Bootcamp.create(bootcamps);
+   //w await Bootcamp.create(bootcamps);
     // await User.create(users, { validateBeforeSave: false });
-    // await Review.create(reviews);
+    await Course.create(courses);
     console.log('data successfully loaded');
   } catch (err) {
     console.log(err);
@@ -44,9 +46,9 @@ const importData = async () => {
 // Delete All from Db
 const deleteData = async () => {
   try {
-    await Bootcamp.deleteMany();
+   // await Bootcamp.deleteMany();
     // await User.deleteMany();
-    // await Review.deleteMany();
+    await Course.deleteMany();
     console.log('data deleted successful');
   } catch (err) {
     console.log(err);
