@@ -47,3 +47,32 @@ exports.createCourse = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// @desc UPDATE A single Courses
+
+// @route PUT /api/v1/courses/:id
+
+// @access Private
+
+exports.updateCourse = factory.updateOne(Course);
+
+// @desc Delete A single Courses
+
+// @route Delete /api/v1/courses/:id
+
+// @access Private
+
+exports.deleteCourse = catchAsync(async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+
+  if (!course) {
+    next(new AppError(`No course with id of ${req.params.id}`));
+  }
+
+  await course.remove();
+
+  res.status(204).json({
+    status: 'success',
+    data: {},
+  });
+});
