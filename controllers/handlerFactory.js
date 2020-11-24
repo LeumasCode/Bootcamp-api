@@ -58,7 +58,7 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
-exports.getAll = (Model) =>
+exports.getAll = (Model, populate) =>
   catchAsync(async (req, res, next) => {
     // To allow for nested GET reviews on tour
     let filter;
@@ -70,7 +70,9 @@ exports.getAll = (Model) =>
       .limitFields()
       .paginate();
 
-   
+    if (populate) {
+      features.query = features.query.populate(populate);
+    }
 
     // await the query
     const doc = await features.query;

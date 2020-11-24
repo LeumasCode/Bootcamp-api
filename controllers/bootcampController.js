@@ -1,3 +1,4 @@
+const path = require('path');
 const Bootcamp = require('../models/bootcampModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -10,7 +11,7 @@ const factory = require('./handlerFactory');
 
 // @access Public
 
-exports.getAllBootcamp = factory.getAll(Bootcamp);
+exports.getAllBootcamp = factory.getAll(Bootcamp, 'courses');
 
 // @desc GET A SINGLE BOOTCAMP
 
@@ -18,7 +19,10 @@ exports.getAllBootcamp = factory.getAll(Bootcamp);
 
 // @access Public
 
-exports.getBootcamp = factory.getOne(Bootcamp, {path: 'courses', select: 'name description'});
+exports.getBootcamp = factory.getOne(Bootcamp, {
+  path: 'courses',
+  select: 'name description',
+});
 
 // @desc CREATE NEW BOOTCAMP
 
@@ -73,7 +77,7 @@ exports.deleteBootcamp = catchAsync(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(id);
 
   if (!bootcamp) {
-    next(new AppError(`Bootcamp not found with id ${id}`, 404));
+    return next(new AppError(`Bootcamp not found with id ${id}`, 404));
   }
 
   bootcamp.remove();
@@ -104,7 +108,7 @@ exports.getBootcampWithin = catchAsync(async (req, res, next) => {
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
 
   if (!lat || !lng) {
-    next(
+    return next(
       new AppError(
         'Please provide latitude and longitude in format lat, lng.',
         400
@@ -122,5 +126,57 @@ exports.getBootcampWithin = catchAsync(async (req, res, next) => {
     data: {
       bootcamp,
     },
+  });
+});
+
+// @desc Upload Photo for bootcamp
+
+// @route Put /api/v1/bootcamps/:id/photo
+
+// @access Private
+
+exports.bootcampPhotoUpload = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const bootcamp = await Bootcamp.findById(id);
+
+  if (!bootcamp) {
+    return next(new AppError(`Bootcamp not found with id ${id}`, 404));
+  }
+
+  if (!req.files) {
+    return next(new AppError('Please upload a file', 400));
+  }
+
+  const file = req.files.file;
+
+  // Make sure the image is a photo
+  if (!file.mimetype.startsWith('image')) {
+    return next(new AppError('Please upload an image file', 400));
+  }
+
+  // Check File Size
+  if (file.size === process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new AppError(
+        `Please upload an image file less than ${process.env.MAX_FILE_UPLOAD}`,
+        400
+      )
+    );
+  }
+
+  // Create Custom FileName
+  file.name = `photo_${id}${path.parse(file.name).ext}`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.error(error);
+      return next(new AppError('Problem with file upload', 500));
+    }
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+
+    res.status(200).json({
+      status: 'success',
+      data: file.name,
+    });
   });
 });

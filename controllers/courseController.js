@@ -11,7 +11,12 @@ const factory = require('./handlerFactory');
 
 // @access Public
 
-exports.getCourses = factory.getAll(Course);
+
+
+exports.getCourses = factory.getAll(Course, {
+  path: 'bootcamp',
+  select: 'name description',
+});
 
 // @desc GET A single Courses
 
