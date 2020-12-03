@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: [validator.isEmail, 'Please enter a valid email'],
     required: [true, 'Please input your email'],
+    unique: true
   },
   role: {
     type: String,
@@ -62,6 +63,11 @@ userSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+};
+
+// Match user enter password to hashed password
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 const User = mongoose.model('User', userSchema);

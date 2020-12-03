@@ -30,3 +30,38 @@ exports.register = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// @desc LOGIN USER
+
+// @route POST /api/v1/users/login
+
+// @access Public
+exports.login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // validate email and password
+  if (!email || !password) {
+    return next(new AppError('Please provide email and password', 400));
+  }
+  //  check for user
+  const user = await User.findOne({ email }).select('+password');
+
+  if (!user) {
+    return next(new AppError('invalid email or password', 401));
+  }
+  // check if password matches
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    return next(new AppError('invalid email or password', 401));
+  }
+  // create token
+  const token = user.getSignedJwtToken();
+
+  res.status(200).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+});
