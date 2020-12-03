@@ -2,6 +2,28 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const User = require('../models/userModel');
 
+// Get Token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
+  const token = user.getSignedJwtToken();
+
+  const options = {
+    expires: new Date(
+      Date.now + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === 'production') options.secure = true;
+
+  res.status(statusCode).cookie('token', token, options).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 // @desc REGISTER USER
 
 // @route POST /api/v1/users/register
@@ -20,15 +42,7 @@ exports.register = catchAsync(async (req, res, next) => {
   });
 
   // create token
-  const token = user.getSignedJwtToken();
-
-  res.status(200).json({
-    success: true,
-    token,
-    data: {
-      user,
-    },
-  });
+  sendTokenResponse(user, 201, res);
 });
 
 // @desc LOGIN USER
@@ -55,13 +69,5 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('invalid email or password', 401));
   }
   // create token
-  const token = user.getSignedJwtToken();
-
-  res.status(200).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  });
+  sendTokenResponse(user, 201, res);
 });

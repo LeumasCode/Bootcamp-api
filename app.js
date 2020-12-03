@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 // route files
 const bootcampRoute = require('./routes/bootcampRoutes');
@@ -13,6 +14,9 @@ const globalErrorHandler = require('./controllers/errorControllers');
 const app = express();
 // use the express body-parser
 app.use(express.json());
+
+// cookie parser
+app.use(cookieParser());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
