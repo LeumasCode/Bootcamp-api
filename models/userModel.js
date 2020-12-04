@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -13,7 +14,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: [validator.isEmail, 'Please enter a valid email'],
     required: [true, 'Please input your email'],
-    unique: true
+    unique: true,
   },
   role: {
     type: String,
@@ -68,6 +69,24 @@ userSchema.methods.getSignedJwtToken = function () {
 // Match user enter password to hashed password
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Generate and hash password Token
+userSchema.methods.getResetPasswordToken = function () {
+  // Generate the token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash the token and set to resetPasswordToken Field
+
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expire
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10mins
+
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);

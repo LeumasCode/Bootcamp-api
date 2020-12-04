@@ -1,4 +1,5 @@
 const express = require('express');
+const { protect, authorize } = require('../controllers/authController');
 const {
   getAllBootcamp,
   getBootcamp,
@@ -17,15 +18,20 @@ const router = express.Router();
 //  Re-route into other resource Router
 router.use('/:bootcampId/courses', courseRouter);
 
-router.route('/').get(getAllBootcamp).post(createBootcamp);
+router
+  .route('/')
+  .get(getAllBootcamp)
+  .post(protect, authorize('publisher', 'admin'), createBootcamp);
 
-router.route('/:id/photo').put(bootcampPhotoUpload);
+router
+  .route('/:id/photo')
+  .put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload);
 
 router
   .route('/:id')
   .get(getBootcamp)
-  .put(updateBootcamp)
-  .delete(deleteBootcamp);
+  .put(protect, authorize('publisher', 'admin'), updateBootcamp)
+  .delete(protect, authorize('publisher', 'admin'), deleteBootcamp);
 
 router.route('/radius/:zipcode/:distance/:unit').get(getBootcampWithin);
 
