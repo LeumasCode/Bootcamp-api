@@ -9,6 +9,7 @@ const {
   updatePassword,
   updateMe,
   authorize,
+  logout,
 } = require('../controllers/authController');
 
 const {
@@ -23,6 +24,7 @@ const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
+router.get('/logout', protect, logout);
 
 router.get('/me', protect, getMe);
 

@@ -83,6 +83,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
+  // set the token from cookie
   // else if (req.cookies.token) {
   //   token = req.cookies.token;
   // }
@@ -117,6 +118,24 @@ exports.getMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     user,
+  });
+});
+
+// @desc LOGGED USER Out
+
+// @route GET /api/v1/users/logout
+
+// @access Private
+
+exports.logout = catchAsync(async (req, res, next) => {
+  res.cookie('token', 'none', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: null,
   });
 });
 
