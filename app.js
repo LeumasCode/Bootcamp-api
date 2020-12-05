@@ -7,6 +7,9 @@ const fileUpload = require('express-fileupload');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
+const cors = require('cors')
 // route files
 const bootcampRoute = require('./routes/bootcampRoutes');
 const courseRoute = require('./routes/courseRoutes');
@@ -37,7 +40,20 @@ app.use(mongoSanitize());
 app.use(helmet());
 
 // Prevent XSS attacks
-app.use(xss())
+app.use(xss());
+
+// Rate limiting
+const limitter = rateLimit({
+  windowMs: 10 * 60 * 1000, //10mins
+  max: 100,
+});
+app.use(limitter);
+
+// prevent http params pollution
+app.use(hpp());
+
+// enable CORS
+app.use(cors())
 
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
