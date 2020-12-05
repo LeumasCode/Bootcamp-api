@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload');
 const bootcampRoute = require('./routes/bootcampRoutes');
 const courseRoute = require('./routes/courseRoutes');
 const userRoute = require('./routes/userRoutes');
+const reviewRoute = require('./routes/reviewRoutes');
 
 const globalErrorHandler = require('./controllers/errorControllers');
 
@@ -33,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/bootcamps', bootcampRoute);
 app.use('/api/v1/courses', courseRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 app.use(globalErrorHandler);
 

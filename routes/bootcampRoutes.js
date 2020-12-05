@@ -12,11 +12,15 @@ const {
 
 // Include other resource Router
 const courseRouter = require('./courseRoutes');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
 //  Re-route into other resource Router
 router.use('/:bootcampId/courses', courseRouter);
+
+// Re-route into review resourse
+router.use('/:bootcampId/reviews', reviewRouter);
 
 router
   .route('/')
