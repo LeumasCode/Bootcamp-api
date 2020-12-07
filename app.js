@@ -9,7 +9,7 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
-const cors = require('cors')
+const cors = require('cors');
 // route files
 const bootcampRoute = require('./routes/bootcampRoutes');
 const courseRoute = require('./routes/courseRoutes');
@@ -36,8 +36,18 @@ app.use(fileUpload());
 // Sanitize Data
 app.use(mongoSanitize());
 
-// Set security Headers
-app.use(helmet());
+//Set security Headers
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'", 'https:', 'http:', 'data:', 'ws:'],
+      baseUri: ["'self'"],
+      fontSrc: ["'self'", 'https:', 'http:', 'data:'],
+      scriptSrc: ["'self'", 'https:', 'http:', 'blob:'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https:', 'http:'],
+    },
+  })
+);
 
 // Prevent XSS attacks
 app.use(xss());
@@ -53,7 +63,7 @@ app.use(limitter);
 app.use(hpp());
 
 // enable CORS
-app.use(cors())
+app.use(cors());
 
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
